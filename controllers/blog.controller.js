@@ -28,19 +28,43 @@ async function createNewBlog(req, res) {
   }
 }
 
-async function getAllBlogs(req, res) {
-  try {
-    const allBlogs = await Blog.find({}).populate("createdBy");
-    res.render("home", {
-      user: req.user,
-      allBlogs,
-    });
-    console.log(allBlogs)
-  } catch (error) {
-    console.log("Error: ", error);
-    return res.render('/',{
-        error : "Error 500"
-    })
+function getAllBlogs(sortByField, sortByOrder) {
+  return async (req, res)=>{
+    try {
+        const sortBy = { [sortByField ]: (sortByOrder)};
+        console.log(sortBy)
+        // In JavaScript, square brackets ([]) in object keys are used for computed property names.
+
+
+        // const allBlogs = await Blog.find({}).populate("createdBy");
+        const allBlogs = await Blog.aggregate(
+            [
+                {
+                    $sort : sortBy,
+                },
+                {
+                    $lookup:{
+                        from : "users",
+                        localField : "createdBy",
+                        foreignField : "_id",
+                        as : "createdBy"
+                    }
+                },
+                
+            ]
+        )
+        // console.log(allBlogs[0].title)
+
+        res.render("home", {
+          user: req.user,
+          allBlogs,
+        });
+          } catch (error) {
+        console.log("Error: ", error);
+        return res.render('/',{
+            error : "Error 500"
+        })
+      }
   }
 }
 async function getBlog(req, res) {

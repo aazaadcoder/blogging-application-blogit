@@ -11,6 +11,7 @@ const cookieParser = require('cookie-parser')
 const { checkForAuthentication } = require('./middlewares/authentication.middleware');
 const blogRouter = require('./routes/blog.route');
 const Blog = require('./models/blog.model');
+const { getAllBlogs } = require('./controllers/blog.controller');
 
 
 connectDB(process.env.MONGO_URL);
@@ -34,13 +35,7 @@ app.use("/user", userRouter);
 app.use("/blog", blogRouter);
 
 
-app.get("/", async (req, res) => {
-    const allBlogs  = await Blog.find({});
-    res.render("home", {
-        user : req.user,
-        allBlogs, 
-    });
-})
+app.get("/", getAllBlogs("createdAt", -1));
 
 
 

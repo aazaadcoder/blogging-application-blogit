@@ -8,6 +8,7 @@
 
 <body>
     <%- include("./partials/nav.ejs") %>
+    <%- include("./partials/dropdownNav.ejs") %>
 
         <% if (locals.allBlogs) { %>
             <div class="container mt-4 row row-cols-3">
@@ -23,6 +24,11 @@
                                 <h5 class="card-title">
                                     <%= blog.title %>
                                 </h5>
+                                <div>
+                                    <cite>
+                                        - <%= blog.createdBy[0]?.fullName%>
+                                    </cite>
+                                </div>
                                 <!-- <p class="card-text"><%= blog.title.slice(0,30) %></p> -->
                                 <a href="/blog/<%= blog._id %>" class="btn btn-primary">Read</a>
                             </div>

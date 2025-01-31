@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const multer = require("multer");
 const path = require("path");
-const { createNewBlog, getBlog } = require("../controllers/blog.controller");
+const { createNewBlog, getBlog, getAllBlogs } = require("../controllers/blog.controller");
 const { restrictToLogin } = require("../middlewares/authentication.middleware");
 const Blog = require("../models/blog.model");
 const { get } = require("http");
@@ -37,6 +37,7 @@ blogRouter.get("/:blogId", getBlog);
 
 blogRouter.post("/comment", restrictToLogin("token"), createCommentOnBlog);
 
-
+blogRouter.get("/sort/latest", getAllBlogs("createdAt", -1));
+blogRouter.get("/sort/oldest", getAllBlogs("createdAt", +1));
 
 module.exports = blogRouter;
