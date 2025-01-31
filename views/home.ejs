@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include("./partials/head.ejs") %>
+        <title>Home Page</title>
+</head>
+
+<body>
+    <%- include("./partials/nav.ejs") %>
+
+        <% if (locals.allBlogs) { %>
+            <div class="container mt-4 row row-cols-3">
+                <% locals.allBlogs.forEach(blog=> { %>
+                    <div class="col">
+                        <div class="card mt-4" style="width: 18rem;">
+                            <img 
+                            src="<%= blog.coverImage %>" 
+                            class="card-img-top" 
+                            style="max-height: 150px;">
+    
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <%= blog.title %>
+                                </h5>
+                                <!-- <p class="card-text"><%= blog.title.slice(0,30) %></p> -->
+                                <a href="/blog/<%= blog._id %>" class="btn btn-primary">Read</a>
+                            </div>
+                        </div>
+                    </div>
+                    <% }) %>
+            </div>
+        <% } %>
+
+        <%- include("./partials/script.ejs") %>
+
+</body>
+
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include("./partials/head.ejs") %>
+        <title>Blog</title>
+</head>
+
+<body>
+    <%- include("./partials/nav.ejs") %>
+
+        <div class="container mt-4 mb-4">
+            <h1>
+                <%= locals.blog.title %>
+            </h1>
+
+            <img src="<%= blog.coverImage %>" alt="" style="height: 400px ; width: 80vw">
+            <pre>
+            <%= blog.body %>
+        </pre>
+            <div class="container">
+                <img src="<%= blog.createdBy.profileImage %>" alt="" style="height: 50px;">
+                <%= blog.createdBy.fullName %>
+            </div>
+        </div>
+
+        <div class="container mt-4 mb-4">
+            <div class="form-floating">
+                <form action="/blog/comment" method="post">
+                    <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2 "
+                        style="height: 100px" name="commentContent" required></textarea>
+                        <% if (locals.user?.fullName) { %>
+                            <button class="btn btn-primary mt-2 mb-4" type="submit">Comment</button>
+                        
+                        <%}  else { %>
+                            <div style="display: inline;;">
+                                <button class="btn btn-primary mt-2 mb-4" disabled type="submit">Comment</button>
+                            <p style="color: red;">Login to comment</p>
+                            </div>
+                            <% } %>
+                </form>
+            </div>
+        </div>
+
+        <% if (locals.allBlogComments) { %>
+            <div class="container">
+                <h3>Comments (<%= allBlogComments.length %>)</h3>
+                <% locals.allBlogComments.forEach(comment => { %>
+                    <div class="card mt-2 mb-2">
+                        <div class="card-body">
+                          <blockquote class="blockquote mb-0">
+                            <img src="<%= comment.createdBy.profileImage %>" alt="" style="height: 20px;">
+                            <cite style="font-size:small;"><%= comment.createdBy.fullName %></cite>
+                            <footer class="footer"> </footer>
+                            <p><%= comment.content %></p>
+                          </blockquote>
+                        </div>
+                      </div>
+                <% }) %>
+            </div>
+        <% } %>
+
+
+
+
+
+
+
+        <%- include("./partials/script.ejs") %>
+
+</body>
+
+</html>
