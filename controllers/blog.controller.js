@@ -1,6 +1,6 @@
 const Blog = require("../models/blog.model");
 const Comment = require("../models/comment.model");
- 
+
 async function createNewBlog(req, res) {
   // console.log(req.file);
   if (!req.body.title || !req.body.body || !req.file || !req.file.filename) {
@@ -28,6 +28,21 @@ async function createNewBlog(req, res) {
   }
 }
 
+async function getAllBlogs(req, res) {
+  try {
+    const allBlogs = await Blog.find({}).populate("createdBy");
+    res.render("home", {
+      user: req.user,
+      allBlogs,
+    });
+    console.log(allBlogs)
+  } catch (error) {
+    console.log("Error: ", error);
+    return res.render('/',{
+        error : "Error 500"
+    })
+  }
+}
 async function getBlog(req, res) {
   const blogId = req.params.blogId;
 
@@ -38,7 +53,6 @@ async function getBlog(req, res) {
     const allBlogComments = await Comment.find({
       blogId: blog._id,
     }).populate("createdBy");
-
 
     if (!blog) {
       console.log("blog doesnot exists");
@@ -54,12 +68,11 @@ async function getBlog(req, res) {
   } catch (error) {
     console.log(error);
     return res.redirect(req.headers.referer);
-
-    
   }
 }
 
 module.exports = {
   createNewBlog,
   getBlog,
+  getAllBlogs
 };
