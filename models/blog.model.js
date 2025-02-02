@@ -22,6 +22,10 @@ const blogSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref : "user",
         required : true
+    },
+    isPublic:{
+        type: Boolean,
+        default : true,
     }
 }, {timestamps  : true })
 

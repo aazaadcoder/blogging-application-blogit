@@ -2,47 +2,54 @@
 <html lang="en">
 
 <head>
-    <%- include("./partials/head.ejs") %>
-        <title>Home Page</title>
+  <%- include("./partials/head.ejs") %>
+  <title>Home Page</title>
 </head>
 
 <body>
-    <%- include("./partials/nav.ejs") %>
-    <%- include("./partials/dropdownNav.ejs") %>
+  <%- include("./partials/nav.ejs") %>
+  <%- include("./partials/dropdownNav.ejs") %>
 
-        <% if (locals.allBlogs) { %>
-            <div class="container mt-4 row row-cols-3">
-                <% locals.allBlogs.forEach(blog=> { %>
-                    <div class="col">
-                        <div class="card mt-4" style="width: 18rem;">
-                            <img 
-                            src="<%= blog.coverImage %>" 
-                            class="card-img-top" 
-                            style="max-height: 150px;">
-    
-                            <div class="card-body">
-                                <h5 class="card-title">
-                                    <%= blog.title %>
-                                </h5>
-                                <div class="m-2 " >
-                                    <cite><%= blog.createdBy[0]?.fullName%></cite>
-                                </div>
-                                <div class="m-2 "  >
-                                    <cite><%= blog.viewCount %> views</cite>
-                                    <cite> | <%= blog.createdAt.getDate().toString() %>/</cite>
-                                    <cite><%= blog.createdAt.getMonth()+1 %>/</cite>
-                                    <cite><%= blog.createdAt.getFullYear().toString() %></cite>
-
-                                </div>
-                                <a href="/blog/view/<%= blog._id %>" class="btn btn-primary">Read</a>
-                            </div>
-                        </div>
+  <% if (locals.allBlogs) { %>
+  <div class="container mt-4 row row-cols-3">
+    <% locals.allBlogs.forEach(blog=> { %>
+        <% if (blog.isPublic) { %>
+            <div class="col">
+                <div class="card mt-4" style="width: 18rem;">
+                  <img src="<%= blog.coverImage %>" class="card-img-top" style="max-height: 150px;">
+          
+                  <div class="card-body">
+                    <h5 class="card-title">
+                      <%= blog.title %>
+                    </h5>
+                    <div class="m-2 ">
+                      <cite>
+                        <%= blog.createdBy[0]?.fullName%>
+                      </cite>
                     </div>
-                    <% }) %>
-            </div>
+                    <div class="m-2 ">
+                      <cite>
+                        <%= blog.viewCount %> views
+                      </cite>
+                      <cite> | <%= blog.createdAt.getDate().toString() %>/</cite>
+                      <cite>
+                        <%= blog.createdAt.getMonth()+1 %>/
+                      </cite>
+                      <cite>
+                        <%= blog.createdAt.getFullYear().toString() %>
+                      </cite>
+          
+                    </div>
+                    <a href="/blog/view/<%= blog._id %>" class="btn btn-primary">Read</a>
+                  </div>
+                </div>
+              </div>
         <% } %>
+    <% }) %>
+  </div>
+  <% } %>
 
-        <%- include("./partials/script.ejs") %>
+  <%- include("./partials/script.ejs") %>
 
 </body>
 

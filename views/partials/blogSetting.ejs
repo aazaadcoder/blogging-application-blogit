@@ -1,0 +1,64 @@
+<% if (locals.user) { %>
+<% if (locals.user.role=="admin" || locals.blog?.createdBy?._id==locals.user?._id) { %>
+<div class="container mt-4">
+  <p class="d-inline-flex gap-1 ">
+    <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+      Blog Setting
+    </a>
+  </p>
+  <div class="collapse" id="collapseExample">
+
+    <div class="m-4">
+
+
+      <!-- delete button -->
+
+
+      <!-- Button trigger modal -->
+      <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+        Delete Blog
+      </button>
+
+      <!-- Modal -->
+      <div class="modal fade " id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              Are you sure to delete the blog.
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <form action="/blog/delete/<%=locals.blog?._id %>" method="post" style="display: inline;" class="m-2">
+                <button type="submit" class="btn btn-danger">Confirm Delete</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- edit button -->
+      <form action="/blog/edit/<%=locals.blog?._id %>" style="display: inline; " class="m-2">
+        <button type="submit" class="btn btn-outline-warning">Edit Blog</button>
+      </form>
+
+      <!-- privacy edit button -->
+
+
+      <div class="btn-group">
+        <form action="/blog/editprivacy/<%= locals.blog?._id %>" method="post" style="display: inline;">
+          <button type="submit" class="btn btn-outline-info " aria-expanded="false">
+            Change Privacy Status
+          </button>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+<% } %>
+<% } %>

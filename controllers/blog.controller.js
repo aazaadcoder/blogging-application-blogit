@@ -3,7 +3,6 @@ const Blog = require("../models/blog.model");
 const Comment = require("../models/comment.model");
 const Like = require("../models/like.model");
 
-
 async function createNewBlog(req, res) {
   // console.log(req.file);
   if (!req.body.title || !req.body.body || !req.file || !req.file.filename) {
@@ -35,7 +34,6 @@ function getAllBlogs(sortByField, sortByOrder) {
   return async (req, res) => {
     try {
       const sortBy = { [sortByField]: sortByOrder };
-      console.log(sortBy);
       // In JavaScript, square brackets ([]) in object keys are used for computed property names.
 
       // const allBlogs = await Blog.find({}).populate("createdBy");
@@ -70,44 +68,35 @@ async function getBlog(req, res) {
   const blogId = req.params.blogId;
 
   try {
-
-    //getting the blog data and author data 
+    //getting the blog data and author data and increment the view count
     const blog = await Blog.findOneAndUpdate(
-        {_id : blogId},
-        {
-            $inc :{ viewCount : +1}
-        },
-        {new : true}
+      { _id: blogId },
+      {
+        $inc: { viewCount: +1 },
+      },
+      { new: true }
     ).populate("createdBy");
-    // const  blog = await Blog.aggregate(
-    //     [
-    //         {
-    //             $match: {_id : new mongoose.Types.ObjectId(blogId)}
-    //         },
-    //         {
-    //             $set :{ viewCount : "$viewCount"+1}
-    //         }
-            
-    //     ]
-    // );
 
-    console.log(blog)
+    if (blog.isPublic == false && blog.createdBy != req.user?._id) {
+      console.log("unathorized access to the a private article.");
+      return res.redirect("/");
+    }
+
+    console.log(blog);
 
     // if the blog with the requested blogId doesnot exists
     if (!blog) {
-        console.log("blog doesnot exists");
-        return res.redirect("/");
-      }
-    
+      console.log("blog doesnot exists");
+      return res.redirect("/");
+    }
+
     //fetching the count of the likes on the blog
-    const likeData = await Like.find({blogId});
+    const likeData = await Like.find({ blogId });
 
     //fetching all comments of the blog
     const allBlogComments = await Comment.find({
       blogId: blog._id,
     }).populate("createdBy");
-
-
 
     return res.render("blog", {
       user: req.user,
@@ -130,10 +119,31 @@ async function deleteBlog(req, res) {
 
     console.log("blog deleted");
     return res.redirect("/");
-
   } catch (error) {
     console.log(error);
     return res.redirect("/");
+  }
+}
+
+async function toggleBlogPrivacy(req, res) {
+  const blogId = req.params.blogId;
+
+  try {
+    const blogData = await Blog.findOneAndUpdate(
+      { _id: blogId },
+      {
+        $set: {
+          isPublic: { $not: ["$isPublic"] },
+        },
+      },
+      { new: true }
+    );
+
+    console.log("blog updated successfully");
+    return res.redirect(`/blog/view/${blogId}`);
+  } catch (error) {
+    console.log("Error in changing privacy status", error);
+    return res.redirect(`/blog/view/${blogId}`);
   }
 }
 module.exports = {
@@ -141,4 +151,5 @@ module.exports = {
   getBlog,
   getAllBlogs,
   deleteBlog,
+  toggleBlogPrivacy,
 };
