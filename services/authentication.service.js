@@ -4,11 +4,13 @@ const secretKey = "dafafaaasddfdsfaf";
 
 
 function createTokenForUser(user){
+
     const payload= {
         fullName : user.fullName,
         email : user.email, 
         profileImageUrl : user.profileImage,
         _id : user._id,
+        role : user.role
     }
 
     const token = JWT.sign(payload, secretKey);

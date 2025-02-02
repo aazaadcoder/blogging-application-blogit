@@ -15,8 +15,6 @@ async function userSignUp(req, res) {
 
 async function userSignIn(req, res) {
   const { email, password } = req.body;
-  console.log(email, password);
-
   try {
     const token = await User.matchPasswordAndGenerateToken(email, password);
 

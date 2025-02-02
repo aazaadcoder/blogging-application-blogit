@@ -1,11 +1,12 @@
 const { Router } = require("express");
 const multer = require("multer");
 const path = require("path");
-const { createNewBlog, getBlog, getAllBlogs } = require("../controllers/blog.controller");
-const { restrictToLogin } = require("../middlewares/authentication.middleware");
+const { createNewBlog, getBlog, getAllBlogs, deleteBlog } = require("../controllers/blog.controller");
+const { restrictToLogin, restrictToOwner, checkForAuthentication } = require("../middlewares/authentication.middleware");
 const Blog = require("../models/blog.model");
 const { get } = require("http");
 const { createCommentOnBlog } = require("../controllers/comment.controller");
+const { likeBlog, toggleLike } = require("../controllers/like.controller");
 const blogRouter = Router();
 
 const storage = multer.diskStorage({
@@ -33,11 +34,22 @@ blogRouter.post("/",
 );
 
 
-blogRouter.get("/:blogId", getBlog);
+blogRouter.get("/view/:blogId", getBlog);
+blogRouter.post("/delete/:blogId", restrictToOwner("token"), deleteBlog );
+
+blogRouter.post("/like/:blogId", restrictToLogin("token"), toggleLike );
+
+
+
+// a user can delete his article 
+
+
 
 blogRouter.post("/comment", restrictToLogin("token"), createCommentOnBlog);
 
 blogRouter.get("/sort/latest", getAllBlogs("createdAt", -1));
 blogRouter.get("/sort/oldest", getAllBlogs("createdAt", +1));
+
+
 
 module.exports = blogRouter;

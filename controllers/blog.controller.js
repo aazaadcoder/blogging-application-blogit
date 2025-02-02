@@ -1,5 +1,6 @@
 const Blog = require("../models/blog.model");
 const Comment = require("../models/comment.model");
+const Like = require("../models/like.model");
 
 async function createNewBlog(req, res) {
   // console.log(req.file);
@@ -29,74 +30,94 @@ async function createNewBlog(req, res) {
 }
 
 function getAllBlogs(sortByField, sortByOrder) {
-  return async (req, res)=>{
+  return async (req, res) => {
     try {
-        const sortBy = { [sortByField ]: (sortByOrder)};
-        console.log(sortBy)
-        // In JavaScript, square brackets ([]) in object keys are used for computed property names.
+      const sortBy = { [sortByField]: sortByOrder };
+      console.log(sortBy);
+      // In JavaScript, square brackets ([]) in object keys are used for computed property names.
 
+      // const allBlogs = await Blog.find({}).populate("createdBy");
+      const allBlogs = await Blog.aggregate([
+        {
+          $sort: sortBy,
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "createdBy",
+            foreignField: "_id",
+            as: "createdBy",
+          },
+        },
+      ]);
+      // console.log(allBlogs[0].title)
 
-        // const allBlogs = await Blog.find({}).populate("createdBy");
-        const allBlogs = await Blog.aggregate(
-            [
-                {
-                    $sort : sortBy,
-                },
-                {
-                    $lookup:{
-                        from : "users",
-                        localField : "createdBy",
-                        foreignField : "_id",
-                        as : "createdBy"
-                    }
-                },
-                
-            ]
-        )
-        // console.log(allBlogs[0].title)
-
-        res.render("home", {
-          user: req.user,
-          allBlogs,
-        });
-          } catch (error) {
-        console.log("Error: ", error);
-        return res.render('/',{
-            error : "Error 500"
-        })
-      }
-  }
+      res.render("home", {
+        user: req.user,
+        allBlogs,
+      });
+    } catch (error) {
+      console.log("Error: ", error);
+      return res.render("/", {
+        error: "Error 500",
+      });
+    }
+  };
 }
 async function getBlog(req, res) {
   const blogId = req.params.blogId;
 
   try {
-    const blog = await Blog.findById(blogId).populate("createdBy");
-    //using populate we will get all the details of the user
 
+    //getting the blog data and author data 
+    const blog = await Blog.findById(blogId).populate("createdBy");
+
+    // if the blog with the requested blogId doesnot exists
+    if (!blog) {
+        console.log("blog doesnot exists");
+        return res.redirect("/");
+      }
+    
+    //fetching the count of the likes on the blog
+    const likeData = await Like.find({blogId});
+
+    //fetching all comments of the blog
     const allBlogComments = await Comment.find({
       blogId: blog._id,
     }).populate("createdBy");
 
-    if (!blog) {
-      console.log("blog doesnot exists");
-      return res.redirect(req.headers.referer);
-    }
+
 
     return res.render("blog", {
       user: req.user,
       blog,
-      author: blog.createdBy?.fullName,
+      likeData,
       allBlogComments,
     });
   } catch (error) {
     console.log(error);
-    return res.redirect(req.headers.referer);
+    return res.redirect("/");
   }
 }
 
+async function deleteBlog(req, res) {
+  try {
+    const blogId = req.params.blogId;
+    if (!blogId) return res.send("blog id is required");
+
+    const deletedBlog = await Blog.deleteOne({ _id: blogId });
+
+    console.log("blog deleted");
+    return res.redirect("/");
+
+  } catch (error) {
+    console.log(error);
+    return res.redirect("/");
+  }
+}
 module.exports = {
   createNewBlog,
   getBlog,
-  getAllBlogs
+  getAllBlogs,
+  deleteBlog,
 };
