@@ -45,7 +45,7 @@ blogRouter.post("/like/:blogId", restrictToLogin("token"), toggleLike );
 
 
 
-blogRouter.post("/comment", restrictToLogin("token"), createCommentOnBlog);
+blogRouter.post("/comment/:blogId", restrictToLogin("token"), createCommentOnBlog);
 
 blogRouter.get("/sort/latest", getAllBlogs("createdAt", -1));
 blogRouter.get("/sort/oldest", getAllBlogs("createdAt", +1));

@@ -2,16 +2,18 @@ const Comment = require("../models/comment.model");
 
  
 async function createCommentOnBlog(req, res){
-    commentContent = req.body.commentContent;
+    const blogId = req.params.blogId;
+
+    if(!blogId){
+        console.log("blogId required.")
+        return res.redirect("/")
+    }
+
+    const commentContent = req.body.commentContent;
     if(!commentContent) {
         console.log("comment field required.")
-        return res.redirect(req.header.referer,{
-            error : ""
-        });
+        return res.redirect(`/blog/view/${blogId}`)
     }
-    // console.log(req.headers.referer)
-
-    const blogId  = req.headers.referer.split("http://localhost:8000/blog/").join("");
 
 
     try {
@@ -20,12 +22,15 @@ async function createCommentOnBlog(req, res){
             createdBy : req.user._id,
             blogId ,
         })
+        return res.redirect(`/blog/view/${blogId}`)
+
 
     } catch (error) {
-        console.log(Error);
-        // req.flash("Error", "Error in commenting.")
+        console.log("Server Error in commenting: ", error);
+        return res.redirect(`/blog/view/${blogId}`)
+
     }
-    return res.redirect(req.headers.referer)
+
 
 }
 
