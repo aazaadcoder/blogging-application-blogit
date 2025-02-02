@@ -10,6 +10,10 @@ const blogSchema = new Schema({
         type: String,
         required : true 
     },
+    viewCount:{
+        type: Number,
+        default : 0 
+    },
     coverImage : {
         type: String, 
         required: false

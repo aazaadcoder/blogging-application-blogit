@@ -1,6 +1,8 @@
+const { default: mongoose } = require("mongoose");
 const Blog = require("../models/blog.model");
 const Comment = require("../models/comment.model");
 const Like = require("../models/like.model");
+
 
 async function createNewBlog(req, res) {
   // console.log(req.file);
@@ -20,7 +22,7 @@ async function createNewBlog(req, res) {
     // return res.render('home', {
     //     successMessage : "Blog created successfully."
     // })
-    return res.redirect(`/blog/${blog._id}`);
+    return res.redirect(`/blog/view/${blog._id}`);
   } catch (error) {
     console.log(Error);
     return res.render("home", {
@@ -70,7 +72,26 @@ async function getBlog(req, res) {
   try {
 
     //getting the blog data and author data 
-    const blog = await Blog.findById(blogId).populate("createdBy");
+    const blog = await Blog.findOneAndUpdate(
+        {_id : blogId},
+        {
+            $inc :{ viewCount : +1}
+        },
+        {new : true}
+    ).populate("createdBy");
+    // const  blog = await Blog.aggregate(
+    //     [
+    //         {
+    //             $match: {_id : new mongoose.Types.ObjectId(blogId)}
+    //         },
+    //         {
+    //             $set :{ viewCount : "$viewCount"+1}
+    //         }
+            
+    //     ]
+    // );
+
+    console.log(blog)
 
     // if the blog with the requested blogId doesnot exists
     if (!blog) {

@@ -38,7 +38,7 @@
         <!-- like section -->
 
         <div class="container">
-            <h2> Likes : <%= locals.likeData?.length %></h2>
+            <h2> Likes (<%= locals.likeData?.length %>)</h2>
             <% let liked = false; %>
             <% locals.likeData?.forEach(like => { %>
                 <% if (like.ownerId == user._id) { %>

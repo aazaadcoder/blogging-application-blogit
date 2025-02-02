@@ -24,10 +24,15 @@
                                 <h5 class="card-title">
                                     <%= blog.title %>
                                 </h5>
-                                <div>
-                                    <cite>
-                                        - <%= blog.createdBy[0]?.fullName%>
-                                    </cite>
+                                <div class="m-2 " >
+                                    <cite><%= blog.createdBy[0]?.fullName%></cite>
+                                </div>
+                                <div class="m-2 "  >
+                                    <cite><%= blog.viewCount %> views</cite>
+                                    <cite> | <%= blog.createdAt.getDate().toString() %>/</cite>
+                                    <cite><%= blog.createdAt.getMonth()+1 %>/</cite>
+                                    <cite><%= blog.createdAt.getFullYear().toString() %></cite>
+
                                 </div>
                                 <a href="/blog/view/<%= blog._id %>" class="btn btn-primary">Read</a>
                             </div>
