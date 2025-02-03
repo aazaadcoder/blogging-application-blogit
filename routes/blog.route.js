@@ -49,7 +49,11 @@ blogRouter.post("/comment/:blogId", restrictToLogin("token"), createCommentOnBlo
 
 blogRouter.get("/sort/latest", getAllBlogs("createdAt", -1));
 blogRouter.get("/sort/oldest", getAllBlogs("createdAt", +1));
+// blogRouter.get("/sort/commentcount", getAllBlogs("createdAt", +1));
+// blogRouter.get("/sort/likecount", getAllBlogs("createdAt", +1));
+blogRouter.get("/sort/viewcount", getAllBlogs("viewCount", -1));
 
 blogRouter.post("/editprivacy/:blogId", restrictToOwner("token"), toggleBlogPrivacy)
+blogRouter.post("/editcontent/:blogId", restrictToOwner("token"), toggleBlogPrivacy)
 
 module.exports = blogRouter;
