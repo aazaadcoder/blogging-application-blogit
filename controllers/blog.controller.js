@@ -77,13 +77,14 @@ async function getBlog(req, res) {
       { new: true }
     ).populate("createdBy");
 
-    if (blog.isPublic == false && blog.createdBy != req.user?._id) {
+    console.log(String(blog.createdBy._id))
+    console.log(req.user?._id)
+    if (blog.isPublic == false && String(blog.createdBy._id )!= req.user?._id) {
       console.log("unathorized access to the a private article.");
       return res.redirect("/");
     }
 
-    console.log(blog);
-
+ 
     // if the blog with the requested blogId doesnot exists
     if (!blog) {
       console.log("blog doesnot exists");
@@ -131,15 +132,17 @@ async function toggleBlogPrivacy(req, res) {
   try {
     const blogData = await Blog.findOneAndUpdate(
       { _id: blogId },
-      {
-        $set: {
-          isPublic: { $not: ["$isPublic"] },
-        },
-      },
+      [
+        {
+          $set:{
+            isPublic : { $not : "$isPublic"}
+          }
+        }
+      ],
       { new: true }
     );
 
-    console.log("blog updated successfully");
+    console.log("blog updated successfully", blogData);
     return res.redirect(`/blog/view/${blogId}`);
   } catch (error) {
     console.log("Error in changing privacy status", error);
