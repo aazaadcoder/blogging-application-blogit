@@ -30,7 +30,7 @@ async function createNewBlog(req, res) {
   }
 }
 
-function getAllBlogs(sortByField, sortByOrder) {
+function getAllPublicBlogs(sortByField, sortByOrder) {
   return async (req, res) => {
     try {
       const sortBy = { [sortByField]: sortByOrder };
@@ -41,6 +41,9 @@ function getAllBlogs(sortByField, sortByOrder) {
         {
           $sort: sortBy,
         },
+        {
+          $match : {isPublic : true}
+        }
         {
           $lookup: {
             from: "users",
@@ -64,6 +67,46 @@ function getAllBlogs(sortByField, sortByOrder) {
     }
   };
 }
+
+function getAllPublicBlogsSortedByAField(sortByField) {
+  return async (req, res) => {
+    try {
+      const sortedBlogData = await Blog.aggregate([
+        {
+          $lookup: {
+            from: sortByField,
+            foreignField: "blogId",
+            localField: "_id",
+            as: "indexCount",
+          },
+        },
+        {
+          $match : { isPublic : true}
+        },
+        {
+          $addFields: {
+            indexCount: { $size: "$indexCount" },
+          },
+        },
+        {
+          $sort: { indexCount: -1 },
+        },     
+        
+      ]);
+
+      console.log(sortedBlogData)
+      return res.render("home", {
+        user: req.user,
+        allBlogs: sortedBlogData,
+      });
+    } catch (error) {
+      console.log("Error in sort by likes: ", error);
+      return res.render("home", {
+        error: "Error 500",
+      });
+    }
+  };
+}
 async function getBlog(req, res) {
   const blogId = req.params.blogId;
 
@@ -77,14 +120,13 @@ async function getBlog(req, res) {
       { new: true }
     ).populate("createdBy");
 
-    console.log(String(blog.createdBy._id))
-    console.log(req.user?._id)
-    if (blog.isPublic == false && String(blog.createdBy._id )!= req.user?._id) {
+    console.log(String(blog.createdBy._id));
+    console.log(req.user?._id);
+    if (blog.isPublic == false && String(blog.createdBy._id) != req.user?._id) {
       console.log("unathorized access to the a private article.");
       return res.redirect("/");
     }
 
- 
     // if the blog with the requested blogId doesnot exists
     if (!blog) {
       console.log("blog doesnot exists");
@@ -134,10 +176,10 @@ async function toggleBlogPrivacy(req, res) {
       { _id: blogId },
       [
         {
-          $set:{
-            isPublic : { $not : "$isPublic"}
-          }
-        }
+          $set: {
+            isPublic: { $not: "$isPublic" },
+          },
+        },
       ],
       { new: true }
     );
@@ -152,7 +194,8 @@ async function toggleBlogPrivacy(req, res) {
 module.exports = {
   createNewBlog,
   getBlog,
-  getAllBlogs,
+  getAllPublicBlogs,
   deleteBlog,
   toggleBlogPrivacy,
+  getAllPublicBlogsSortedByAField,
 };

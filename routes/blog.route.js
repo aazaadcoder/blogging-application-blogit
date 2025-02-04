@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const multer = require("multer");
 const path = require("path");
-const { createNewBlog, getBlog, getAllBlogs, deleteBlog, toggleBlogPrivacy } = require("../controllers/blog.controller");
+const { createNewBlog, getBlog,   deleteBlog, toggleBlogPrivacy, getAllPublicBlogs, getAllPublicBlogsSortedByAField } = require("../controllers/blog.controller");
 const { restrictToLogin, restrictToOwner } = require("../middlewares/authentication.middleware");
 const Blog = require("../models/blog.model");
 const { get } = require("http");
@@ -47,11 +47,11 @@ blogRouter.post("/like/:blogId", restrictToLogin("token"), toggleLike );
 
 blogRouter.post("/comment/:blogId", restrictToLogin("token"), createCommentOnBlog);
 
-blogRouter.get("/sort/latest", getAllBlogs("createdAt", -1));
-blogRouter.get("/sort/oldest", getAllBlogs("createdAt", +1));
-// blogRouter.get("/sort/commentcount", getAllBlogs("createdAt", +1));
-// blogRouter.get("/sort/likecount", getAllBlogs("createdAt", +1));
-blogRouter.get("/sort/viewcount", getAllBlogs("viewCount", -1));
+blogRouter.get("/sort/latest", getAllPublicBlogs("createdAt", -1));
+blogRouter.get("/sort/oldest", getAllPublicBlogs("createdAt", +1));
+blogRouter.get("/sort/viewcount", getAllPublicBlogs("viewCount", -1));
+blogRouter.get("/sort/commentcount", getAllPublicBlogsSortedByAField("comments"));
+blogRouter.get("/sort/likecount", getAllPublicBlogsSortedByAField("likes"));
 
 blogRouter.post("/editprivacy/:blogId", restrictToOwner("token"), toggleBlogPrivacy)
 blogRouter.post("/editcontent/:blogId", restrictToOwner("token"), toggleBlogPrivacy)
