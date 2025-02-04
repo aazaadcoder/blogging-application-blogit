@@ -41,7 +41,7 @@
       </div>
 
       <!-- edit button -->
-      <form action="/blog/edit/<%=locals.blog?._id %>" style="display: inline; " class="m-2">
+      <form action="/blog/edit-content/<%=locals.blog?._id %>" style="display: inline; " class="m-2">
         <button type="submit" class="btn btn-outline-warning">Edit Blog</button>
       </form>
 
@@ -49,7 +49,7 @@
 
       <!-- privacy edit button -->
       <div class="btn-group">
-        <form action="/blog/editprivacy/<%= locals.blog?._id %>" method="post" style="display: inline;">
+        <form action="/blog/edit-privacy/<%= locals.blog?._id %>" method="post" style="display: inline;">
           <button type="submit" class="btn btn-outline-info " aria-expanded="false">
             Change Privacy Status
           </button>

@@ -53,7 +53,18 @@ blogRouter.get("/sort/viewcount", getAllPublicBlogs("viewCount", -1));
 blogRouter.get("/sort/commentcount", getAllPublicBlogsSortedByAField("comments"));
 blogRouter.get("/sort/likecount", getAllPublicBlogsSortedByAField("likes"));
 
-blogRouter.post("/editprivacy/:blogId", restrictToOwner("token"), toggleBlogPrivacy)
-blogRouter.post("/editcontent/:blogId", restrictToOwner("token"), toggleBlogPrivacy)
+blogRouter.post("/edit-privacy/:blogId", restrictToOwner("token"), toggleBlogPrivacy)
+// blogRouter.post("/editcontent/:blogId", restrictToOwner("token"), toggleBlogPrivacy)
+blogRouter.post("/edit-content/:blogId", (req, res)=>{
+  const blogId = req.params.blogId;
+
+  if(!blogId){
+    console.log("blogId required");
+    return res.redirect("/");
+  }
+  console.log(req);
+  req.blogId = blogId;
+  return res.render("editBlogContent")
+})
 
 module.exports = blogRouter;

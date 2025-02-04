@@ -191,6 +191,41 @@ async function toggleBlogPrivacy(req, res) {
     return res.redirect(`/blog/view/${blogId}`);
   }
 }
+
+async function editBlog(req, res) {
+  // console.log(req.file);
+  
+  const blogId = req.params.blogId;
+
+  if(!blogId) {
+    console.log("blog id required");
+    return res.redirect("/");
+  }
+
+  if (!req.body.title && !req.body.body && !req.file && !req.file.filename) {
+    return res.render("addBlog", {
+      error: "at least one fields are required.",
+    });
+  }
+  try {
+    const oldBlogData = await Blog.findOne({
+      _id : blogId
+    })
+    const newBlogData = await Blog.create({
+      title: req.body.title || oldBlogData.title,
+      body: req.body.body || oldBlogData.body,
+      coverImage: `/uploads/${req.file.filename}` || oldBlogData.coverImage,
+      createdBy: req.user._id,
+    });
+
+    return res.redirect(`/blog/view/${blog._id}`);
+  } catch (error) {
+    console.log(Error);
+    return res.render("home", {
+      error: "Server Error creating new blog. Try again.",
+    });
+  }
+}
 module.exports = {
   createNewBlog,
   getBlog,
@@ -198,4 +233,5 @@ module.exports = {
   deleteBlog,
   toggleBlogPrivacy,
   getAllPublicBlogsSortedByAField,
+  editBlog
 };
