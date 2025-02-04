@@ -43,7 +43,7 @@ function getAllPublicBlogs(sortByField, sortByOrder) {
         },
         {
           $match : {isPublic : true}
-        }
+        },
         {
           $lookup: {
             from: "users",

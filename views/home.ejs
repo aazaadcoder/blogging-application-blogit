@@ -13,7 +13,7 @@
   <% if (locals.allBlogs) { %>
   <div class="container mt-4 row row-cols-3">
     <% locals.allBlogs.forEach(blog=> { %>
-        <% if (blog.isPublic) { %>
+        
             <div class="col">
                 <div class="card mt-4" style="width: 18rem;">
                   <img src="<%= blog.coverImage %>" class="card-img-top" style="max-height: 150px;">
@@ -44,7 +44,7 @@
                   </div>
                 </div>
               </div>
-        <% } %>
+        
     <% }) %>
   </div>
   <% } %>
