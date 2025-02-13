@@ -42,8 +42,7 @@ function restrictToOwner(cookieName) {
       //   accessing the token and blogId from the req
       const token = req.cookies[cookieName];
       const blogId = req.params.blogId;
-      console.log(blogId)
-
+      
       //   if token doesnot exists redirect to the blog page
       if (!token) return res.redirect(`/blog/${blogId}`);
 

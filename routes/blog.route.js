@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const multer = require("multer");
 const path = require("path");
-const { createNewBlog, getBlog,   deleteBlog, toggleBlogPrivacy, getAllPublicBlogs, getAllPublicBlogsSortedByAField } = require("../controllers/blog.controller");
+const { createNewBlog, getBlog,   deleteBlog, toggleBlogPrivacy, getAllPublicBlogs, getAllPublicBlogsSortedByAField, editBlog, getEditContentPage } = require("../controllers/blog.controller");
 const { restrictToLogin, restrictToOwner } = require("../middlewares/authentication.middleware");
 const Blog = require("../models/blog.model");
 const { get } = require("http");
@@ -53,18 +53,12 @@ blogRouter.get("/sort/viewcount", getAllPublicBlogs("viewCount", -1));
 blogRouter.get("/sort/commentcount", getAllPublicBlogsSortedByAField("comments"));
 blogRouter.get("/sort/likecount", getAllPublicBlogsSortedByAField("likes"));
 
+
+
 blogRouter.post("/edit-privacy/:blogId", restrictToOwner("token"), toggleBlogPrivacy)
 // blogRouter.post("/editcontent/:blogId", restrictToOwner("token"), toggleBlogPrivacy)
-blogRouter.post("/edit-content/:blogId", (req, res)=>{
-  const blogId = req.params.blogId;
+blogRouter.get("/edit-content-page/:blogId",restrictToOwner("token"),  getEditContentPage)
 
-  if(!blogId){
-    console.log("blogId required");
-    return res.redirect("/");
-  }
-  console.log(req);
-  req.blogId = blogId;
-  return res.render("editBlogContent")
-})
+blogRouter.post("/edit-content/:blogId",upload.any(), editBlog)
 
 module.exports = blogRouter;

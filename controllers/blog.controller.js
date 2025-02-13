@@ -4,7 +4,7 @@ const Comment = require("../models/comment.model");
 const Like = require("../models/like.model");
 
 async function createNewBlog(req, res) {
-  // console.log(req.file);
+  console.log(req.file);
   if (!req.body.title || !req.body.body || !req.file || !req.file.filename) {
     return res.render("addBlog", {
       error: "all fields are required.",
@@ -23,7 +23,7 @@ async function createNewBlog(req, res) {
     // })
     return res.redirect(`/blog/view/${blog._id}`);
   } catch (error) {
-    console.log(Error);
+    console.log(error);
     return res.render("home", {
       error: "Server Error creating new blog. Try again.",
     });
@@ -42,7 +42,7 @@ function getAllPublicBlogs(sortByField, sortByOrder) {
           $sort: sortBy,
         },
         {
-          $match : {isPublic : true}
+          $match: { isPublic: true },
         },
         {
           $lookup: {
@@ -81,7 +81,7 @@ function getAllPublicBlogsSortedByAField(sortByField) {
           },
         },
         {
-          $match : { isPublic : true}
+          $match: { isPublic: true },
         },
         {
           $addFields: {
@@ -90,11 +90,10 @@ function getAllPublicBlogsSortedByAField(sortByField) {
         },
         {
           $sort: { indexCount: -1 },
-        },     
-        
+        },
       ]);
 
-      console.log(sortedBlogData)
+      console.log(sortedBlogData);
       return res.render("home", {
         user: req.user,
         allBlogs: sortedBlogData,
@@ -120,8 +119,6 @@ async function getBlog(req, res) {
       { new: true }
     ).populate("createdBy");
 
-    console.log(String(blog.createdBy._id));
-    console.log(req.user?._id);
     if (blog.isPublic == false && String(blog.createdBy._id) != req.user?._id) {
       console.log("unathorized access to the a private article.");
       return res.redirect("/");
@@ -192,40 +189,74 @@ async function toggleBlogPrivacy(req, res) {
   }
 }
 
-async function editBlog(req, res) {
-  // console.log(req.file);
-  
+async function getEditContentPage(req, res) {
   const blogId = req.params.blogId;
 
-  if(!blogId) {
+  if (!blogId) {
+    console.log("blogId required");
+    return res.redirect("/");
+  }
+  const oldBlogData = await Blog.findOne({
+    _id: blogId,
+  });
+  return res.render("editBlogContent", {
+    blogData : oldBlogData,
+  });
+}
+
+
+async function editBlog(req, res) {
+  const blogId = req.params.blogId;
+
+  if (!blogId) {
     console.log("blog id required");
     return res.redirect("/");
   }
 
-  if (!req.body.title && !req.body.body && !req.file && !req.file.filename) {
-    return res.render("addBlog", {
+  console.log(req.body.title)
+  console.log(req.body.body)
+  console.log(req.files)
+  console.log(req.files.filename)
+
+  if (!req.body?.title && !req.body?.body && !req.files && !req.files[0]?.filename) {
+    return res.render("editBlogContent", {
       error: "at least one fields are required.",
     });
   }
   try {
-    const oldBlogData = await Blog.findOne({
-      _id : blogId
-    })
-    const newBlogData = await Blog.create({
-      title: req.body.title || oldBlogData.title,
-      body: req.body.body || oldBlogData.body,
-      coverImage: `/uploads/${req.file.filename}` || oldBlogData.coverImage,
-      createdBy: req.user._id,
-    });
 
-    return res.redirect(`/blog/view/${blog._id}`);
+    let isCoverImage = false;
+    let coverImageUrl = "";
+    const updatedData = {
+      title : req.body.title,
+      body : req.body.body, 
+      createdBy : req.user._id,
+    }
+    
+    if (req.files[0]?.filename) {
+      coverImageUrl = `/uploads/${req.files[0].filename}`;
+      isCoverImage = true;
+    }
+    if(isCoverImage) updatedData.coverImage = coverImageUrl;
+
+    // const newBlogData = await Blog.updateOne({ _id: blogId }, [
+    //   { $set: { title: newTitle } },
+    //   { $set: { body: newBody } },
+    //   { $cond: {isCoverImage , then: {$set: { "$coverImage": coverImageUrl }} , else: {} }},
+    //   { $set: { createdBy: req.user._id } },
+    // ]);
+
+    const newBlogData = await Blog.updateOne({_id : blogId} , {$set : updatedData})
+
+    return res.redirect(`/blog/view/${blogId}`);
   } catch (error) {
-    console.log(Error);
+    console.log(error);
     return res.render("home", {
-      error: "Server Error creating new blog. Try again.",
+      error: "Server Error updating the new blog. Try again.",
     });
   }
 }
+
 module.exports = {
   createNewBlog,
   getBlog,
@@ -233,5 +264,7 @@ module.exports = {
   deleteBlog,
   toggleBlogPrivacy,
   getAllPublicBlogsSortedByAField,
-  editBlog
+  getEditContentPage,
+  editBlog,
+
 };

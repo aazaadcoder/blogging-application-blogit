@@ -2,36 +2,37 @@
 <html lang="en">
 
 <head>
-    <%- include("./partials/head.ejs") %>
-        <title>Add Blog</title>
+  <%- include("./partials/head.ejs") %>
+  <title>Add Blog</title>
 </head>
 
 <body>
-    <%- include("./partials/nav.ejs") %>
-        <div class="container">
-            <form action="/blog" method="post" enctype="multipart/form-data">
-                <div class=" mb-3 mt-3">
-                    <input type="file" class="form-control" id="coverImage" aria-describedby="coverImage" name="coverImage">
-                    <label for="coverImage">New Cover Image</label>
-                </div>
-                <div class="form-floating mb-3 mt-3">
-                    <input type="title" class="form-control" id="title" aria-describedby="title" name="title">
-                    <label for="title">Update Title</label>
-                </div>
-                <div class="form-floating mb-3 mt-3">
-                    <textarea class="form-control" placeholder="Body of you Blog" id="body" style="height: 400px"
-                        name="body"></textarea>
-                    <label for="body">Update Body</label>
 
-                </div>
-                
-                <div class="form-floating mb-3 mt-3">
-                    <button class="btn btn-primary">Submit</button>
-                </div>
-            </form>
-        </div>
+  <%- include("./partials/nav.ejs") %>
+  <div class="container">
+    <form action="/blog/edit-content/<%=locals.blogData?._id %>" method="post" enctype="multipart/form-data">
+      <div class=" mb-3 mt-3">
+        <input type="file" class="form-control" id="coverImage" aria-describedby="coverImage" name="coverImage" value="<% if (locals.blogData) { %>
+            <%= locals.blogData.coverImage %>
+           <% } %>">
+        <label for="coverImage">New Cover Image</label>
+      </div>
+      <div class="form-floating mb-3 mt-3">
+        <input type="text" class="form-control" id="title" aria-describedby="title" name="title" <% if (locals.blogData) { %> value="<%= locals.blogData.title %>" <% } %>>
+        <label for="title">Update Title</label>
+      </div>
+      <div class="form-floating mb-3 mt-3">
+        <textarea type="text" class="form-control" placeholder="Body of your Blog" id="body" style="height: 400px" name="body"><% if (locals.blogData) { %><%= locals.blogData.body %><% } %></textarea>
+        <label for="body">Update Body</label>
+      </div>
 
-        <%- include("./partials/script.ejs") %>
+      <div class="form-floating mb-3 mt-3">
+        <button class="btn btn-primary" type="submit">Submit</button>
+      </div>
+    </form>
+  </div>
+
+  <%- include("./partials/script.ejs") %>
 
 </body>
 
