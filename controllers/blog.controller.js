@@ -2,6 +2,7 @@ const { default: mongoose } = require("mongoose");
 const Blog = require("../models/blog.model");
 const Comment = require("../models/comment.model");
 const Like = require("../models/like.model");
+const { ObjectId } = require("mongodb"); 
 
 async function createNewBlog(req, res) {
   console.log(req.file);
@@ -62,6 +63,35 @@ function getAllPublicBlogs(sortByField, sortByOrder) {
     } catch (error) {
       console.log("Error: ", error);
       return res.render("/", {
+        error: "Error 500",
+      });
+    }
+  };
+}
+function getAllUserBlogs(sortByField, sortByOrder) {
+  return async (req, res) => {
+    try {
+      const sortBy = { [sortByField]: sortByOrder };
+      // In JavaScript, square brackets ([]) in object keys are used for computed property names.
+
+      // const allBlogs = await Blog.find({}).populate("createdBy");
+      console.log(req.user._id);
+      const allBlogs = await Blog.aggregate([
+        {
+          $match: { createdBy : new ObjectId(req.user._id )},
+        },
+        {
+          $sort: sortBy,
+        },
+      ]);
+      console.log(allBlogs)
+      res.render("myblogs", {
+        user: req.user,
+        allBlogs,
+      });
+    } catch (error) {
+      console.log("Error: ", error);
+      return res.render("home", {
         error: "Error 500",
       });
     }
@@ -200,10 +230,9 @@ async function getEditContentPage(req, res) {
     _id: blogId,
   });
   return res.render("editBlogContent", {
-    blogData : oldBlogData,
+    blogData: oldBlogData,
   });
 }
-
 
 async function editBlog(req, res) {
   const blogId = req.params.blogId;
@@ -213,31 +242,35 @@ async function editBlog(req, res) {
     return res.redirect("/");
   }
 
-  console.log(req.body.title)
-  console.log(req.body.body)
-  console.log(req.files)
-  console.log(req.files.filename)
+  console.log(req.body.title);
+  console.log(req.body.body);
+  console.log(req.files);
+  console.log(req.files.filename);
 
-  if (!req.body?.title && !req.body?.body && !req.files && !req.files[0]?.filename) {
+  if (
+    !req.body?.title &&
+    !req.body?.body &&
+    !req.files &&
+    !req.files[0]?.filename
+  ) {
     return res.render("editBlogContent", {
       error: "at least one fields are required.",
     });
   }
   try {
-
     let isCoverImage = false;
     let coverImageUrl = "";
     const updatedData = {
-      title : req.body.title,
-      body : req.body.body, 
-      createdBy : req.user._id,
-    }
-    
+      title: req.body.title,
+      body: req.body.body,
+      createdBy: req.user._id,
+    };
+
     if (req.files[0]?.filename) {
       coverImageUrl = `/uploads/${req.files[0].filename}`;
       isCoverImage = true;
     }
-    if(isCoverImage) updatedData.coverImage = coverImageUrl;
+    if (isCoverImage) updatedData.coverImage = coverImageUrl;
 
     // const newBlogData = await Blog.updateOne({ _id: blogId }, [
     //   { $set: { title: newTitle } },
@@ -246,7 +279,10 @@ async function editBlog(req, res) {
     //   { $set: { createdBy: req.user._id } },
     // ]);
 
-    const newBlogData = await Blog.updateOne({_id : blogId} , {$set : updatedData})
+    const newBlogData = await Blog.updateOne(
+      { _id: blogId },
+      { $set: updatedData }
+    );
 
     return res.redirect(`/blog/view/${blogId}`);
   } catch (error) {
@@ -266,5 +302,5 @@ module.exports = {
   getAllPublicBlogsSortedByAField,
   getEditContentPage,
   editBlog,
-
+  getAllUserBlogs,
 };

@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const multer = require("multer");
 const path = require("path");
-const { createNewBlog, getBlog,   deleteBlog, toggleBlogPrivacy, getAllPublicBlogs, getAllPublicBlogsSortedByAField, editBlog, getEditContentPage } = require("../controllers/blog.controller");
+const { createNewBlog, getBlog,   deleteBlog, toggleBlogPrivacy, getAllPublicBlogs, getAllPublicBlogsSortedByAField, editBlog, getEditContentPage, getAllUserBlogs } = require("../controllers/blog.controller");
 const { restrictToLogin, restrictToOwner } = require("../middlewares/authentication.middleware");
 const Blog = require("../models/blog.model");
 const { get } = require("http");
@@ -60,5 +60,6 @@ blogRouter.post("/edit-privacy/:blogId", restrictToOwner("token"), toggleBlogPri
 blogRouter.get("/edit-content-page/:blogId",restrictToOwner("token"),  getEditContentPage)
 
 blogRouter.post("/edit-content/:blogId",upload.any(), editBlog)
+
 
 module.exports = blogRouter;

@@ -4,6 +4,8 @@ const {
   userSignIn,
   userLogOut,
 } = require("../controllers/user.controller");
+const { getAllUserBlogs } = require("../controllers/blog.controller");
+const { restrictToLogin } = require("../middlewares/authentication.middleware");
 
 const userRouter = Router();
 
@@ -18,5 +20,7 @@ userRouter.get("/signup", (req, res) => {
 userRouter.post("/signup", userSignUp);
 userRouter.post("/signin", userSignIn);
 userRouter.get("/logout", userLogOut);
+
+userRouter.get("/my-blogs", restrictToLogin("token") , getAllUserBlogs("createdAt", -1))
 
 module.exports = userRouter;
